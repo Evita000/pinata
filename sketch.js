@@ -40,6 +40,8 @@ function setup() {
   resetButton = createButton("Reset Piñata");
   resetButton.position(20, 20);
   resetButton.mousePressed(resetGame);
+  resetButton.style("z-index","1000");   // ✅ stays on top
+  resetButton.style("position","fixed"); // ✅ fixed on screen
 }
 
 function draw() {
@@ -69,7 +71,6 @@ function draw() {
       swing -= 2;
     }
 
-    // mystery counter while intact
     text("Taps: " + taps + " / ??", width/2, height - 50);
 
   } else {
@@ -88,7 +89,6 @@ function draw() {
       f.show();
     }
 
-    // reveal the actual taps + victory message 🎉
     text("It took " + taps + " taps!", width/2, height - 50);
     textSize(40);
     fill(0);
@@ -114,7 +114,7 @@ function registerTap() {
       broken = true;
       spawnCandies();
       spawnConfetti();
-      if (cheerSound && !cheerSound.isPlaying()) {  // ✅ safety check
+      if (cheerSound) {   // ✅ always try to play
         cheerSound.play();
       }
     }
@@ -122,12 +122,14 @@ function registerTap() {
 }
 
 function spawnCandies() {
+  candies = [];
   for (let i = 0; i < 30; i++) {
     candies.push(new Candy(random(width), -20, random(10, 25)));
   }
 }
 
 function spawnConfetti() {
+  confetti = [];
   for (let i = 0; i < 50; i++) {
     confetti.push(new Confetti(random(width), -20));
   }
@@ -204,8 +206,8 @@ function resetGame() {
   broken = false;
   taps = 0;
   candies = [];
-  confetti = [];   // clear old confetti
-  breakAt = int(random(6, 12));   // pick a new random taps goal 🎲
+  confetti = [];
+  breakAt = int(random(6, 12));   // 🎲 new random taps goal
 }
 
 function windowResized() {
