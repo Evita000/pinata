@@ -43,19 +43,21 @@ function setup() {
   brokenGif.position(width/2 - 150, height/2 - 150);
   brokenGif.hide(); 
 
-  // ✅ reset button (fixed + above canvas)
+  // ✅ reset button (DOM event listeners for mobile reliability)
   resetButton = createButton("Reset Piñata");
   resetButton.style("position", "fixed");
   resetButton.style("top", "20px");
   resetButton.style("left", "20px");
   resetButton.style("z-index", "9999");
-  resetButton.style("padding", "10px 20px");
-  resetButton.style("font-size", "16px");
+  resetButton.style("padding", "12px 24px");
+  resetButton.style("font-size", "18px");
   resetButton.style("background", "#ffcccc");
   resetButton.style("border", "2px solid #000");
   resetButton.style("cursor", "pointer");
-  resetButton.mousePressed(resetGame);
-  resetButton.touchStarted(resetGame);
+
+  // native listeners
+  resetButton.elt.addEventListener("click", resetGame);
+  resetButton.elt.addEventListener("touchstart", resetGame);
 }
 
 function draw() {
