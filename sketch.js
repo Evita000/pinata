@@ -21,7 +21,7 @@ function preload() {
 function setup() {
   // canvas
   let cnv = createCanvas(windowWidth, windowHeight);
-  cnv.elt.style.touchAction = "none"; // 👈 stops canvas from blocking button taps
+  cnv.elt.style.touchAction = "none"; // stop canvas from eating touches
 
   userStartAudio();   // unlocks audio on mobile
   textAlign(CENTER, CENTER);
@@ -43,12 +43,19 @@ function setup() {
   brokenGif.position(width/2 - 150, height/2 - 150);
   brokenGif.hide(); 
 
-  // reset button (now works on phone)
+  // ✅ reset button (fixed + above canvas)
   resetButton = createButton("Reset Piñata");
-  resetButton.position(20, 20);
-  resetButton.style("z-index", "10");   // 👈 ensure button is above canvas
+  resetButton.style("position", "fixed");
+  resetButton.style("top", "20px");
+  resetButton.style("left", "20px");
+  resetButton.style("z-index", "9999");
+  resetButton.style("padding", "10px 20px");
+  resetButton.style("font-size", "16px");
+  resetButton.style("background", "#ffcccc");
+  resetButton.style("border", "2px solid #000");
+  resetButton.style("cursor", "pointer");
   resetButton.mousePressed(resetGame);
-  resetButton.touchStarted(resetGame);  // 👈 mobile support
+  resetButton.touchStarted(resetGame);
 }
 
 function draw() {
