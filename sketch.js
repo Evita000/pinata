@@ -11,7 +11,6 @@ let resetButton;
 let loading = true;
 
 function preload() {
-  // load sound safely
   cheerSound = loadSound('assets/cheer.mp3', 
     () => console.log("✅ Cheer sound loaded"), 
     () => console.log("❌ Failed to load sound")
@@ -19,7 +18,6 @@ function preload() {
 }
 
 function setup() {
-  // canvas
   let cnv = createCanvas(windowWidth, windowHeight);
   cnv.elt.style.touchAction = "none"; // stop canvas from eating touches
 
@@ -31,19 +29,18 @@ function setup() {
   // intact GIF
   pinataGif = createImg('assets/pinataf.gif');
   pinataGif.attribute("playsinline", ""); 
-  pinataGif.size(300, 300);
-  pinataGif.position(width/2 - 150, height/2 - 150);
   pinataGif.hide();
   pinataGif.elt.onload = () => { loading = false; pinataGif.show(); };
 
   // broken GIF
   brokenGif = createImg('assets/brokenf.gif');
   brokenGif.attribute("playsinline", ""); 
-  brokenGif.size(300, 300);
-  brokenGif.position(width/2 - 150, height/2 - 150);
   brokenGif.hide(); 
 
-  // ✅ reset button (DOM event listeners for mobile reliability)
+  // scale + center gifs initially
+  resizeGifs();
+
+  // ✅ reset button
   resetButton = createButton("Reset Piñata");
   resetButton.style("position", "fixed");
   resetButton.style("top", "20px");
@@ -55,7 +52,7 @@ function setup() {
   resetButton.style("border", "2px solid #000");
   resetButton.style("cursor", "pointer");
 
-  // native listeners
+  // native listeners for mobile reliability
   resetButton.elt.addEventListener("click", resetGame);
   resetButton.elt.addEventListener("touchstart", resetGame);
 }
@@ -229,11 +226,22 @@ function resetGame() {
 
   pinataGif.show();
   brokenGif.hide();
+  resizeGifs(); // make sure gifs are centered after reset
   console.log("🔄 Game reset");
 }
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
-  pinataGif.position(width/2 - 150, height/2 - 150);
-  brokenGif.position(width/2 - 150, height/2 - 150);
+  resizeGifs(); // scale gifs when window resizes
+}
+
+// ✅ helper: resize gifs proportionally
+function resizeGifs() {
+  if (pinataGif && brokenGif) {
+    let imgSize = min(width, height) * 0.7;  // 70% of smaller screen side
+    pinataGif.size(imgSize, imgSize);
+    brokenGif.size(imgSize, imgSize);
+    pinataGif.position(width/2 - imgSize/2, height/2 - imgSize/2);
+    brokenGif.position(width/2 - imgSize/2, height/2 - imgSize/2);
+  }
 }
