@@ -1,5 +1,4 @@
 let confetti = [];
-let loading = true;
 let cheerSound;
 let stickAngle = -30;   // resting angle
 let swing = 0;          // swing amount triggered on tap
@@ -9,21 +8,26 @@ let taps = 0;
 let breakAt;
 let candies = [];
 let resetButton;
+let loading = true;
 
 function preload() {
-  cheerSound = loadSound('assets/cheer.mp3'); 
+  // load sound safely
+  cheerSound = loadSound('assets/cheer.mp3', () => {
+    console.log("✅ Cheer sound loaded");
+  });
 }
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
-  userStartAudio();   // ✅ unlocks sound on iPhone
+  userStartAudio();   // unlocks audio on mobile
+
   textAlign(CENTER, CENTER);
   textSize(32);
   breakAt = int(random(6, 12));   // random taps required
 
   // intact GIF
   pinataGif = createImg('assets/pinataf.gif');
-  pinataGif.attribute("playsinline", "");   // ✅ for iPhone
+  pinataGif.attribute("playsinline", ""); 
   pinataGif.size(300, 300);
   pinataGif.position(width/2 - 150, height/2 - 150);
   pinataGif.hide();
@@ -31,10 +35,10 @@ function setup() {
 
   // broken GIF
   brokenGif = createImg('assets/brokenf.gif');
-  brokenGif.attribute("playsinline", "");   // ✅ for iPhone
+  brokenGif.attribute("playsinline", ""); 
   brokenGif.size(300, 300);
   brokenGif.position(width/2 - 150, height/2 - 150);
-  brokenGif.hide(); // hidden until piñata breaks
+  brokenGif.hide(); 
 
   // reset button
   resetButton = createButton("Reset Piñata");
@@ -44,12 +48,12 @@ function setup() {
 
 function draw() {
   background(random(255), random(255), random(255));
-  
+
   if (loading) {
     fill(0);
     textSize(40);
     text("Loading Piñata...", width/2, height/2);
-    return; // stop drawing until loaded
+    return;
   }
 
   if (!broken) {
@@ -65,11 +69,8 @@ function draw() {
     line(0, 0, 180, -180);
     pop();
 
-    if (swing > 0) {
-      swing -= 2;
-    }
+    if (swing > 0) swing -= 2;
 
-    // mystery counter while intact
     text("Taps: " + taps + " / ??", width/2, height - 50);
 
   } else {
@@ -88,10 +89,9 @@ function draw() {
       f.show();
     }
 
-    // reveal the actual taps + victory message 🎉
+    fill(0);
     text("It took " + taps + " taps!", width/2, height - 50);
     textSize(40);
-    fill(0);
     text("🎉 You did it! 🎉", width/2, height/2 + 200);
   }
 }
@@ -114,7 +114,8 @@ function registerTap() {
       broken = true;
       spawnCandies();
       spawnConfetti();
-      if (cheerSound && !cheerSound.isPlaying()) {  // ✅ safety check
+      if (cheerSound && !cheerSound.isPlaying()) {
+        cheerSound.setVolume(1);
         cheerSound.play();
       }
     }
@@ -122,12 +123,14 @@ function registerTap() {
 }
 
 function spawnCandies() {
+  candies = []; // clear before adding
   for (let i = 0; i < 30; i++) {
     candies.push(new Candy(random(width), -20, random(10, 25)));
   }
 }
 
 function spawnConfetti() {
+  confetti = []; // clear before adding
   for (let i = 0; i < 50; i++) {
     confetti.push(new Confetti(random(width), -20));
   }
@@ -204,15 +207,15 @@ function resetGame() {
   broken = false;
   taps = 0;
   candies = [];
-  confetti = [];   // clear old confetti
-  breakAt = int(random(6, 12));   // pick a new random taps goal 🎲
-}
+  confetti = [];
+  breakAt = int(random(6, 12));
 
+  pinataGif.show();
+  brokenGif.hide();
+}
+ 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
   pinataGif.position(width/2 - 150, height/2 - 150);
   brokenGif.position(width/2 - 150, height/2 - 150);
 }
-
-
- 
