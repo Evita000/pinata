@@ -9,14 +9,16 @@ let taps = 0;
 let breakAt;
 let candies = [];
 let resetButton;
+let canvas;
 
 function preload() {
   cheerSound = loadSound('assets/cheer.mp3'); 
 }
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  canvas = createCanvas(windowWidth, windowHeight);
   userStartAudio();   // ✅ unlocks sound on iPhone
+  canvas.elt.style.touchAction = "none"; // ✅ allow button taps on iPhone
   textAlign(CENTER, CENTER);
   textSize(32);
   breakAt = int(random(6, 12));   // random taps required
@@ -39,12 +41,20 @@ function setup() {
   // reset button
   resetButton = createButton("Reset Piñata");
   resetButton.position(20, 20);
-  resetButton.mousePressed(resetGame);
-  resetButton.style("z-index","1000");   // ✅ stays on top
-  resetButton.style("position","fixed"); // ✅ fixed on screen
-  resetButton.style("background","#fff");
-  resetButton.style("padding","10px 20px");
-  resetButton.style("font-size","16px");
+  resetButton.mousePressed(() => {
+    console.log("RESET PRESSED"); // ✅ debug log for Safari console
+    resetGame();
+  });
+
+  // ✅ styling for iPhone clickability
+  resetButton.style("z-index", "1000");  
+  resetButton.style("position", "fixed"); 
+  resetButton.style("background", "#fff");
+  resetButton.style("padding", "10px 20px");
+  resetButton.style("font-size", "16px");
+  resetButton.style("cursor", "pointer");
+  resetButton.style("border", "2px solid black");
+  resetButton.style("border-radius", "8px");
 }
 
 function draw() {
