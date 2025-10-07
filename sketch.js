@@ -208,10 +208,20 @@ function resetGame() {
   candies = [];
   confetti = [];
   breakAt = int(random(6, 12));   // 🎲 new random taps goal
+
+  // make sure GIF visibility is correct
+  pinataGif.show();
+  brokenGif.hide();
+
+  // reset stick to resting angle
+  swing = 0;
+  stickAngle = -30;
 }
+
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
   pinataGif.position(width/2 - 150, height/2 - 150);
   brokenGif.position(width/2 - 150, height/2 - 150);
 }
+
