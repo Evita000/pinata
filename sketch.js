@@ -1,26 +1,37 @@
-
-
- let stickAngle = -30;   // resting angle
+let confetti = [];
+let loading = true;
+let cheerSound;
+let stickAngle = -30;   // resting angle
 let swing = 0;          // swing amount triggered on tap
 let pinataGif, brokenGif;
 let broken = false;
 let taps = 0;
-let breakAt = 5;
+let breakAt;
 let candies = [];
 let resetButton;
 
+function preload() {
+  cheerSound = loadSound('assets/cheer.mp3'); 
+}
+
 function setup() {
   createCanvas(windowWidth, windowHeight);
+  userStartAudio();   // ✅ unlocks sound on iPhone
   textAlign(CENTER, CENTER);
   textSize(32);
+  breakAt = int(random(6, 12));   // random taps required
 
   // intact GIF
   pinataGif = createImg('assets/pinataf.gif');
+  pinataGif.attribute("playsinline", "");   // ✅ for iPhone
   pinataGif.size(300, 300);
   pinataGif.position(width/2 - 150, height/2 - 150);
+  pinataGif.hide();
+  pinataGif.elt.onload = () => { loading = false; pinataGif.show(); };
 
   // broken GIF
   brokenGif = createImg('assets/brokenf.gif');
+  brokenGif.attribute("playsinline", "");   // ✅ for iPhone
   brokenGif.size(300, 300);
   brokenGif.position(width/2 - 150, height/2 - 150);
   brokenGif.hide(); // hidden until piñata breaks
@@ -33,27 +44,33 @@ function setup() {
 
 function draw() {
   background(random(255), random(255), random(255));
+  
+  if (loading) {
+    fill(0);
+    textSize(40);
+    text("Loading Piñata...", width/2, height/2);
+    return; // stop drawing until loaded
+  }
 
   if (!broken) {
     pinataGif.show();
     brokenGif.hide();
 
-    // draw swinging stick aiming at piñata
+    // swinging stick
     push();
-    translate(width/2 - 120, height - 100);    // pivot point bottom-left
-    rotate(radians(stickAngle + swing));       // apply swing
+    translate(width/2 - 120, height - 100);
+    rotate(radians(stickAngle + swing));
     stroke(80, 50, 20);
     strokeWeight(15);
-    line(0, 0, 180, -180);                     // stick pointing toward piñata
+    line(0, 0, 180, -180);
     pop();
 
-    // gradually return stick to rest
     if (swing > 0) {
       swing -= 2;
     }
 
-    // show tap counter
-    text("Taps: " + taps + " / " + breakAt, width/2, height - 50);
+    // mystery counter while intact
+    text("Taps: " + taps + " / ??", width/2, height - 50);
 
   } else {
     pinataGif.hide();
@@ -64,6 +81,18 @@ function draw() {
       c.update();
       c.show();
     }
+
+    // falling confetti
+    for (let f of confetti) {
+      f.update();
+      f.show();
+    }
+
+    // reveal the actual taps + victory message 🎉
+    text("It took " + taps + " taps!", width/2, height - 50);
+    textSize(40);
+    fill(0);
+    text("🎉 You did it! 🎉", width/2, height/2 + 200);
   }
 }
 
@@ -80,10 +109,14 @@ function mousePressed() {
 function registerTap() {
   if (!broken) {
     taps++;
-    swing = 20;  // make stick swing
+    swing = 20;  // swing the stick
     if (taps >= breakAt) {
       broken = true;
       spawnCandies();
+      spawnConfetti();
+      if (cheerSound && !cheerSound.isPlaying()) {  // ✅ safety check
+        cheerSound.play();
+      }
     }
   }
 }
@@ -91,6 +124,12 @@ function registerTap() {
 function spawnCandies() {
   for (let i = 0; i < 30; i++) {
     candies.push(new Candy(random(width), -20, random(10, 25)));
+  }
+}
+
+function spawnConfetti() {
+  for (let i = 0; i < 50; i++) {
+    confetti.push(new Confetti(random(width), -20));
   }
 }
 
@@ -103,8 +142,6 @@ class Candy {
     this.color = color(random(255), random(255), random(255));
     this.angle = random(TWO_PI);
     this.rotationSpeed = random(-0.05, 0.05);
-
-    // 50% chance: circle, 50% chance: wrapped candy
     this.type = random() < 0.5 ? "circle" : "wrapped";
   }
 
@@ -119,19 +156,46 @@ class Candy {
     rotate(this.angle);
 
     if (this.type === "circle") {
-      // simple candy circle
       fill(this.color);
       noStroke();
       ellipse(0, 0, this.r, this.r);
     } else {
-      // wrapped candy
       fill(this.color);
       noStroke();
-      ellipse(0, 0, this.r, this.r); // body
-      triangle(-this.r/2, 0, -this.r, -this.r/3, -this.r, this.r/3); // left wrapper
-      triangle(this.r/2, 0, this.r, -this.r/3, this.r, this.r/3);   // right wrapper
+      ellipse(0, 0, this.r, this.r);
+      triangle(-this.r/2, 0, -this.r, -this.r/3, -this.r, this.r/3);
+      triangle(this.r/2, 0, this.r, -this.r/3, this.r, this.r/3);
     }
+    pop();
+  }
+}
 
+class Confetti {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.size = random(5, 12);
+    this.speedY = random(2, 6);
+    this.speedX = random(-2, 2);
+    this.color = color(random(255), random(255), random(255));
+    this.angle = random(TWO_PI);
+    this.rotationSpeed = random(-0.1, 0.1);
+  }
+
+  update() {
+    this.y += this.speedY;
+    this.x += this.speedX;
+    this.angle += this.rotationSpeed;
+  }
+
+  show() {
+    push();
+    translate(this.x, this.y);
+    rotate(this.angle);
+    fill(this.color);
+    noStroke();
+    rectMode(CENTER);
+    rect(0, 0, this.size, this.size);
     pop();
   }
 }
@@ -139,14 +203,16 @@ class Candy {
 function resetGame() {
   broken = false;
   taps = 0;
-  candies = [];   // clear old candies
+  candies = [];
+  confetti = [];   // clear old confetti
+  breakAt = int(random(6, 12));   // pick a new random taps goal 🎲
 }
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
-
-  // reposition gifs when window changes size
   pinataGif.position(width/2 - 150, height/2 - 150);
   brokenGif.position(width/2 - 150, height/2 - 150);
 }
 
+
+ 
