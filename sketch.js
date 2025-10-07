@@ -1,4 +1,6 @@
-let confetti = [];
+
+
+  let confetti = [];
 let cheerSound;
 let stickAngle = -30;   // resting angle
 let swing = 0;          // swing amount triggered on tap
@@ -8,7 +10,6 @@ let taps = 0;
 let breakAt;
 let candies = [];
 let resetButton;
-let loading = true;
 
 function preload() {
   cheerSound = loadSound('assets/cheer.mp3'); 
@@ -22,7 +23,7 @@ function setup() {
 
   breakAt = int(random(6, 12));   // random taps required
 
-  recreateGifs(); // ✅ start with fresh gifs
+  recreateGifs(); // ✅ load gifs initially
 
   // reset button
   resetButton = createButton("Reset Piñata");
@@ -219,3 +220,6 @@ function windowResized() {
   if (pinataGif) pinataGif.position(width/2 - 150, height/2 - 150);
   if (brokenGif) brokenGif.position(width/2 - 150, height/2 - 150);
 }
+150, height/2 - 150);
+}
+
