@@ -42,6 +42,9 @@ function setup() {
   resetButton.mousePressed(resetGame);
   resetButton.style("z-index","1000");   // ✅ stays on top
   resetButton.style("position","fixed"); // ✅ fixed on screen
+  resetButton.style("background","#fff");
+  resetButton.style("padding","10px 20px");
+  resetButton.style("font-size","16px");
 }
 
 function draw() {
@@ -218,10 +221,8 @@ function resetGame() {
   stickAngle = -30;
 }
 
-
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
   pinataGif.position(width/2 - 150, height/2 - 150);
   brokenGif.position(width/2 - 150, height/2 - 150);
 }
-
