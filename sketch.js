@@ -32,6 +32,11 @@ function setup() {
     console.log("RESET PRESSED"); // ✅ debug
     resetGame();
   });
+  // Add explicit touchStarted handler for iPhone/iOS
+  resetButton.touchStarted(() => {
+    console.log("RESET PRESSED (touch)");
+    resetGame();
+  });
 
   // ✅ styling for iPhone clickability
   resetButton.style("z-index", "1000");  
