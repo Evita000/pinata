@@ -23,26 +23,13 @@ function setup() {
   textSize(32);
   breakAt = int(random(6, 12));   // random taps required
 
-  // intact GIF
-  pinataGif = createImg('assets/pinataf.gif');
-  pinataGif.attribute("playsinline", "");   // ✅ for iPhone
-  pinataGif.size(300, 300);
-  pinataGif.position(width/2 - 150, height/2 - 150);
-  pinataGif.hide();
-  pinataGif.elt.onload = () => { loading = false; pinataGif.show(); };
-
-  // broken GIF
-  brokenGif = createImg('assets/brokenf.gif');
-  brokenGif.attribute("playsinline", "");   // ✅ for iPhone
-  brokenGif.size(300, 300);
-  brokenGif.position(width/2 - 150, height/2 - 150);
-  brokenGif.hide(); // hidden until piñata breaks
+  createGifs(); // ✅ load gifs initially
 
   // reset button
   resetButton = createButton("Reset Piñata");
   resetButton.position(20, 20);
   resetButton.mousePressed(() => {
-    console.log("RESET PRESSED"); // ✅ debug log for Safari console
+    console.log("RESET PRESSED"); // ✅ debug
     resetGame();
   });
 
@@ -215,24 +202,43 @@ class Confetti {
   }
 }
 
+// ✅ helper function: creates gifs
+function createGifs() {
+  if (pinataGif) pinataGif.remove();
+  if (brokenGif) brokenGif.remove();
+
+  // intact GIF
+  pinataGif = createImg('assets/pinataf.gif');
+  pinataGif.attribute("playsinline", "");
+  pinataGif.size(300, 300);
+  pinataGif.position(width/2 - 150, height/2 - 150);
+  pinataGif.show();
+
+  // broken GIF
+  brokenGif = createImg('assets/brokenf.gif');
+  brokenGif.attribute("playsinline", "");
+  brokenGif.size(300, 300);
+  brokenGif.position(width/2 - 150, height/2 - 150);
+  brokenGif.hide();
+}
+
 function resetGame() {
   broken = false;
   taps = 0;
-  candies = [];
-  confetti = [];
   breakAt = int(random(6, 12));   // 🎲 new random taps goal
-
-  // make sure GIF visibility is correct
-  pinataGif.show();
-  brokenGif.hide();
-
-  // reset stick to resting angle
   swing = 0;
   stickAngle = -30;
+
+  // ✅ instantly clear candies + confetti
+  candies = [];
+  confetti = [];
+
+  // ✅ fully reset GIFs by recreating them
+  createGifs();
 }
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
-  pinataGif.position(width/2 - 150, height/2 - 150);
-  brokenGif.position(width/2 - 150, height/2 - 150);
+  if (pinataGif) pinataGif.position(width/2 - 150, height/2 - 150);
+  if (brokenGif) brokenGif.position(width/2 - 150, height/2 - 150);
 }
