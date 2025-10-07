@@ -9,44 +9,39 @@ let taps = 0;
 let breakAt;
 let candies = [];
 let resetButton;
-let canvas;
 
 function preload() {
   cheerSound = loadSound('assets/cheer.mp3'); 
 }
 
 function setup() {
-  canvas = createCanvas(windowWidth, windowHeight);
+  createCanvas(windowWidth, windowHeight);
   userStartAudio();   // ✅ unlocks sound on iPhone
-  canvas.elt.style.touchAction = "none"; // ✅ allow button taps on iPhone
   textAlign(CENTER, CENTER);
   textSize(32);
   breakAt = int(random(6, 12));   // random taps required
 
-  createGifs(); // ✅ load gifs initially
+  // intact GIF
+  pinataGif = createImg('assets/pinataf.gif');
+  pinataGif.attribute("playsinline", "");   // ✅ for iPhone
+  pinataGif.size(300, 300);
+  pinataGif.position(width/2 - 150, height/2 - 150);
+  pinataGif.hide();
+  pinataGif.elt.onload = () => { loading = false; pinataGif.show(); };
+
+  // broken GIF
+  brokenGif = createImg('assets/brokenf.gif');
+  brokenGif.attribute("playsinline", "");   // ✅ for iPhone
+  brokenGif.size(300, 300);
+  brokenGif.position(width/2 - 150, height/2 - 150);
+  brokenGif.hide(); // hidden until piñata breaks
 
   // reset button
   resetButton = createButton("Reset Piñata");
   resetButton.position(20, 20);
-  resetButton.mousePressed(() => {
-    console.log("RESET PRESSED"); // ✅ debug
-    resetGame();
-  });
-  // Add explicit touchStarted handler for iPhone/iOS
-  resetButton.touchStarted(() => {
-    console.log("RESET PRESSED (touch)");
-    resetGame();
-  });
-
-  // ✅ styling for iPhone clickability
-  resetButton.style("z-index", "1000");  
-  resetButton.style("position", "fixed"); 
-  resetButton.style("background", "#fff");
-  resetButton.style("padding", "10px 20px");
-  resetButton.style("font-size", "16px");
-  resetButton.style("cursor", "pointer");
-  resetButton.style("border", "2px solid black");
-  resetButton.style("border-radius", "8px");
+  resetButton.mousePressed(resetGame);
+  resetButton.style("z-index","1000");   // ✅ stays on top
+  resetButton.style("position","fixed"); // ✅ fixed on screen
 }
 
 function draw() {
@@ -207,43 +202,26 @@ class Confetti {
   }
 }
 
-// ✅ helper function: creates gifs
-function createGifs() {
-  if (pinataGif) pinataGif.remove();
-  if (brokenGif) brokenGif.remove();
-
-  // intact GIF
-  pinataGif = createImg('assets/pinataf.gif');
-  pinataGif.attribute("playsinline", "");
-  pinataGif.size(300, 300);
-  pinataGif.position(width/2 - 150, height/2 - 150);
-  pinataGif.show();
-
-  // broken GIF
-  brokenGif = createImg('assets/brokenf.gif');
-  brokenGif.attribute("playsinline", "");
-  brokenGif.size(300, 300);
-  brokenGif.position(width/2 - 150, height/2 - 150);
-  brokenGif.hide();
-}
-
 function resetGame() {
   broken = false;
   taps = 0;
-  breakAt = int(random(6, 12));   // 🎲 new random taps goal
-  swing = 0;
-  stickAngle = -30;
-
-  // ✅ instantly clear candies + confetti
   candies = [];
   confetti = [];
+  breakAt = int(random(6, 12));   // 🎲 new random taps goal
 
-  // ✅ fully reset GIFs by recreating them
-  createGifs();
+  // make sure GIF visibility is correct
+  pinataGif.show();
+  brokenGif.hide();
+
+  // reset stick to resting angle
+  swing = 0;
+  stickAngle = -30;
 }
+
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
-  if (pinataGif) pinataGif.position(width/2 - 150, height/2 - 150);
-  if (brokenGif) brokenGif.position(width/2 - 150, height/2 - 150);
+  pinataGif.position(width/2 - 150, height/2 - 150);
+  brokenGif.position(width/2 - 150, height/2 - 150);
 }
+
