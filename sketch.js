@@ -12,15 +12,18 @@ let loading = true;
 
 function preload() {
   // load sound safely
-  cheerSound = loadSound('assets/cheer.mp3', () => {
-    console.log("✅ Cheer sound loaded");
-  });
+  cheerSound = loadSound('assets/cheer.mp3', 
+    () => console.log("✅ Cheer sound loaded"), 
+    () => console.log("❌ Failed to load sound")
+  );
 }
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
-  userStartAudio();   // unlocks audio on mobile
+  // canvas
+  let cnv = createCanvas(windowWidth, windowHeight);
+  cnv.elt.style.touchAction = "none"; // 👈 stops canvas from blocking button taps
 
+  userStartAudio();   // unlocks audio on mobile
   textAlign(CENTER, CENTER);
   textSize(32);
   breakAt = int(random(6, 12));   // random taps required
@@ -40,10 +43,12 @@ function setup() {
   brokenGif.position(width/2 - 150, height/2 - 150);
   brokenGif.hide(); 
 
-  // reset button
+  // reset button (now works on phone)
   resetButton = createButton("Reset Piñata");
   resetButton.position(20, 20);
+  resetButton.style("z-index", "10");   // 👈 ensure button is above canvas
   resetButton.mousePressed(resetGame);
+  resetButton.touchStarted(resetGame);  // 👈 mobile support
 }
 
 function draw() {
@@ -93,6 +98,7 @@ function draw() {
     text("It took " + taps + " taps!", width/2, height - 50);
     textSize(40);
     text("🎉 You did it! 🎉", width/2, height/2 + 200);
+    text("Tap Reset to play again", width/2, height/2 + 250);
   }
 }
 
@@ -116,21 +122,23 @@ function registerTap() {
       spawnConfetti();
       if (cheerSound && !cheerSound.isPlaying()) {
         cheerSound.setVolume(1);
+        cheerSound.stop();   // restart from beginning
         cheerSound.play();
+        console.log("🎵 Cheer sound playing");
       }
     }
   }
 }
 
 function spawnCandies() {
-  candies = []; // clear before adding
+  candies = [];
   for (let i = 0; i < 30; i++) {
     candies.push(new Candy(random(width), -20, random(10, 25)));
   }
 }
 
 function spawnConfetti() {
-  confetti = []; // clear before adding
+  confetti = [];
   for (let i = 0; i < 50; i++) {
     confetti.push(new Confetti(random(width), -20));
   }
@@ -212,8 +220,9 @@ function resetGame() {
 
   pinataGif.show();
   brokenGif.hide();
+  console.log("🔄 Game reset");
 }
- 
+
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
   pinataGif.position(width/2 - 150, height/2 - 150);
