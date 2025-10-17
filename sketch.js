@@ -62,11 +62,27 @@ document.body.style.overflow = "hidden";
 }
 
 function draw() {
-// ✨ Soft but obvious animated background + also set BODY bg
-let t = frameCount * 0.012;
-let r = 160 + 95 * sin(t);
-let g = 160 + 95 * sin(t + 2.1);
-let b = 160 + 95 * sin(t + 4.2);
+// 🌈 Smooth color cycle between warm + cool tones
+let t = frameCount * 0.008;
+
+// Blend smoothly between two palettes
+let warmR = 255 * (0.5 + 0.5 * sin(t));
+let warmG = 170 * (0.5 + 0.5 * sin(t + 1.5));
+let warmB = 100 * (0.5 + 0.5 * sin(t + 3.0));
+
+let coolR = 120 * (0.5 + 0.5 * sin(t + 2.5));
+let coolG = 200 * (0.5 + 0.5 * sin(t + 0.8));
+let coolB = 255 * (0.5 + 0.5 * sin(t + 4.0));
+
+// Mix warm and cool gradually
+let mixAmt = (sin(t * 0.5) + 1) / 2; // oscillates between 0–1
+let r = lerp(warmR, coolR, mixAmt);
+let g = lerp(warmG, coolG, mixAmt);
+let b = lerp(warmB, coolB, mixAmt);
+
+background(r, g, b);
+document.body.style.backgroundColor = `rgb(${r|0},${g|0},${b|0})`;
+
 
 background(r, g, b); // canvas background (behind GIFs)
 document.body.style.backgroundColor = `rgb(${r|0},${g|0},${b|0})`; // page background too
@@ -257,5 +273,6 @@ function resizeGifs() {
     brokenGif.position(width/2 - imgSize/2, height/2 - imgSize/2);
   }
 }
+
 
 
