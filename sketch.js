@@ -63,13 +63,13 @@ function setup() {
 }
 
 function draw() {
-  function draw() {
   // 🌈 Smooth, device-proof glow (Canvas HSLA; consistent on iOS/Android)
   drawGlowBackground();
 
-  // Version tag so you can confirm cache-bust on phone
-  noStroke(); fill(255); textSize(12); text('v22', 20, 14);
+  // Version tag so you can confirm cache-bust on phone/laptop
+  noStroke(); fill(255); textSize(12); text('v24', 20, 14);
 
+  // ---- Loading screen text ----
   if (loading) {
     fill(0, 0, 100);
     textSize(40);
@@ -78,32 +78,39 @@ function draw() {
   }
 
   if (!broken) {
-    pinataGif.show(); brokenGif.hide();
+    pinataGif.show(); 
+    brokenGif.hide();
 
     // swinging stick
     push();
     translate(width / 2 - 120, height - 100);
     rotate(radians(stickAngle + swing));
-    stroke(30, 60, 40); strokeWeight(15);
+    stroke(30, 60, 40);
+    strokeWeight(15);
     line(0, 0, 180, -180);
     pop();
     if (swing > 0) swing -= 2;
 
+    // ---- Tap counter text ----
     fill(0, 0, 100);
+    textSize(32);
     text(`Taps: ${taps} / ??`, width / 2, height - 50);
 
   } else {
-    pinataGif.hide(); brokenGif.show();
+    pinataGif.hide(); 
+    brokenGif.show();
 
     for (const c of candies) { c.update(); c.show(); }
     for (const f of confetti) { f.update(); f.show(); }
 
+    // ---- Win texts ----
     fill(0, 0, 100);
     textSize(40);
     text('🎉 You did it! 🎉', width / 2, height / 2 + 200);
     text('💫 Party Unlocked! 💫', width / 2, height / 2 + 250);
   }
 }
+
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
@@ -224,4 +231,5 @@ class Confetti {
     pop();
   }
 }
+
 
