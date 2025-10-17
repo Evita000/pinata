@@ -20,6 +20,10 @@ function preload() {
 function setup() {
   let cnv = createCanvas(windowWidth, windowHeight);
   cnv.elt.style.touchAction = "none"; // stop canvas from eating touches
+  // Make the page background visible and remove scrollbars
+document.body.style.margin = "0";
+document.body.style.overflow = "hidden";
+
 
   userStartAudio();   // unlocks audio on mobile
   textAlign(CENTER, CENTER);
@@ -58,10 +62,15 @@ function setup() {
 }
 
 function draw() {
- let r = 200 + 55 * sin(frameCount * 0.01);
-let g = 200 + 55 * sin(frameCount * 0.013);
-let b = 200 + 55 * sin(frameCount * 0.017);
-background(r, g, b);
+// ✨ Soft but obvious animated background + also set BODY bg
+let t = frameCount * 0.012;
+let r = 160 + 95 * sin(t);
+let g = 160 + 95 * sin(t + 2.1);
+let b = 160 + 95 * sin(t + 4.2);
+
+background(r, g, b); // canvas background (behind GIFs)
+document.body.style.backgroundColor = `rgb(${r|0},${g|0},${b|0})`; // page background too
+
 
   if (loading) {
     fill(0);
@@ -248,4 +257,5 @@ function resizeGifs() {
     brokenGif.position(width/2 - imgSize/2, height/2 - imgSize/2);
   }
 }
+
 
