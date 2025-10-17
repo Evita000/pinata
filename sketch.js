@@ -84,8 +84,22 @@ function setup() {
 }
 
 function draw() {
-  // Flat background (keep it simple to rule out other issues)
-  background(245);
+// 🌈 Soft glowing gradient background (safe, non-strobing)
+noStroke();
+let t = millis() * 0.0002;  // slow time factor for smooth transitions
+
+// two smoothly shifting colors
+let c1 = color(lerpColor(color('#ff9a9e'), color('#fad0c4'), (sin(t) + 1) / 2));
+let c2 = color(lerpColor(color('#a1c4fd'), color('#c2e9fb'), (cos(t) + 1) / 2));
+
+// draw vertical gradient
+for (let y = 0; y < height; y++) {
+  let inter = map(y, 0, height, 0, 1);
+  let c = lerpColor(c1, c2, inter);
+  stroke(c);
+  line(0, y, width, y);
+}
+
 
   if (loading) {
     fill(0); textSize(40);
@@ -222,3 +236,4 @@ function resizeGifs() {
   if (pinataGif){ pinataGif.size(s, s); pinataGif.position((width-s)/2, (height-s)/2); }
   if (brokenGif){ brokenGif.size(s, s); brokenGif.position((width-s)/2, (height-s)/2); }
 }
+
