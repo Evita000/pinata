@@ -83,10 +83,9 @@ function setup() {
   setTimeout(() => { if (loading) { loading = false; pinataGif.show(); } }, 3000);
 }
 
-
 function draw() {
   // 🌈 Soft radial glow background (non-strobing)
-  drawGlowBackground();  
+  drawGlowBackground();
 
   if (loading) {
     fill(255);
@@ -128,51 +127,9 @@ function draw() {
   }
 }
 
-
-
-
-  if (loading) {
-    fill(0); textSize(40);
-    text("Loading Piñata...", width/2, height/2);
-    return;
-  }
-
-  if (!broken) {
-    pinataGif.show();
-    brokenGif.hide();
-
-    // stick swing
-    push();
-    translate(width/2 - 120, height - 100);
-    rotate(radians(stickAngle + swing));
-    stroke(80, 50, 20);
-    strokeWeight(15);
-    line(0, 0, 180, -180);
-    pop();
-
-    if (swing > 0) swing -= 2;
-
-    fill(0);
-    text("Taps: " + taps + " / ??", width/2, height - 50);
-  } else {
-    pinataGif.hide();
-    brokenGif.show();
-
-    for (let c of candies) { c.update(); c.show(); }
-    for (let f of confetti) { f.update(); f.show(); }
-
-    fill(0);
-    text("It took " + taps + " taps!", width/2, height - 50);
-    textSize(40);
-    text("🎉 You did it! 🎉", width/2, height/2 + 200);
-    text("Tap Reset to play again", width/2, height/2 + 250);
-  }
-}
-
 function touchStarted() {
   registerTap();
-  // Required on iOS so the event isn't eaten by DOM
-  return false;
+  return false; // iOS: prevent event from being swallowed
 }
 function mousePressed() { registerTap(); return false; }
 
@@ -261,11 +218,58 @@ function windowResized() {
   resizeGifs();
 }
 
+// ---- centers & scales the GIFs
 function resizeGifs() {
   const s = Math.min(width, height) * 0.7;
   if (pinataGif){ pinataGif.size(s, s); pinataGif.position((width-s)/2, (height-s)/2); }
   if (brokenGif){ brokenGif.size(s, s); brokenGif.position((width-s)/2, (height-s)/2); }
 }
+
+// ---- dreamy glow background helper (this makes it GLOW)
+function drawGlowBackground() {
+  const ctx = drawingContext;
+  const t = millis() * 0.00025;
+  const cx = width / 2;
+  const cy = height / 2;
+  const maxR = Math.hypot(width, height) * 0.75;
+
+  // Two smoothly changing hues
+  const hue1 = (200 + 60 * sin(t * 1.3)) % 360;
+  const hue2 = (320 + 60 * cos(t * 1.1)) % 360;
+
+  // Radial gradient for the glow
+  const grad = ctx.createRadialGradient(cx, cy, maxR * 0.1, cx, cy, maxR);
+  grad.addColorStop(0.0, `hsla(${hue1}, 80%, 65%, 1)`);
+  grad.addColorStop(0.6, `hsla(${(hue1 + hue2) / 2}, 70%, 40%, 0.9)`);
+  grad.addColorStop(1.0, `hsla(${hue2}, 80%, 15%, 1)`);
+
+  ctx.save();
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, width, height);
+  ctx.restore();
+
+  // Subtle white bloom in the center
+  const bloom = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxR * 0.6);
+  bloom.addColorStop(0, 'rgba(255,255,255,0.08)');
+  bloom.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.save();
+  ctx.fillStyle = bloom;
+  ctx.fillRect(0, 0, width, height);
+  ctx.restore();
+}
+
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+  resizeGifs();
+}
+
+function resizeGifs() {
+  const s = Math.min(width, height) * 0.7;
+  if (pinataGif){ pinataGif.size(s, s); pinataGif.position((width-s)/2, (height-s)/2); }
+  if (brokenGif){ brokenGif.size(s, s); brokenGif.position((width-s)/2, (height-s)/2); }
+}
+
 
 
 
