@@ -67,7 +67,8 @@ function draw() {
   drawGlowBackground();
 
   // Version tag so you can confirm cache-bust on phone/laptop
-  noStroke(); fill(255); textSize(12); text('v24', 20, 14);
+ noStroke(); fill(255); textSize(12); text('v25', 20, 14);
+
 
   // ---- Loading screen text ----
   if (loading) {
@@ -231,5 +232,6 @@ class Confetti {
     pop();
   }
 }
+
 
 
