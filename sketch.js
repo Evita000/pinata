@@ -1,5 +1,4 @@
 let confetti = [];
-let loading = true;
 let cheerSound;
 let stickAngle = -30;   // resting angle
 let swing = 0;          // swing amount triggered on tap
@@ -9,21 +8,29 @@ let taps = 0;
 let breakAt;
 let candies = [];
 let resetButton;
+let loading = true;
 
 function preload() {
-  cheerSound = loadSound('assets/cheer.mp3'); 
+  // load sound safely
+  cheerSound = loadSound('assets/cheer.mp3', 
+    () => console.log("✅ Cheer sound loaded"), 
+    () => console.log("❌ Failed to load sound")
+  );
 }
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
-  userStartAudio();   // ✅ unlocks sound on iPhone
+  // canvas
+  let cnv = createCanvas(windowWidth, windowHeight);
+  cnv.elt.style.touchAction = "none"; // stop canvas from eating touches
+
+  userStartAudio();   // unlocks audio on mobile
   textAlign(CENTER, CENTER);
   textSize(32);
   breakAt = int(random(6, 12));   // random taps required
 
   // intact GIF
   pinataGif = createImg('assets/pinataf.gif');
-  pinataGif.attribute("playsinline", "");   // ✅ for iPhone
+  pinataGif.attribute("playsinline", ""); 
   pinataGif.size(300, 300);
   pinataGif.position(width/2 - 150, height/2 - 150);
   pinataGif.hide();
@@ -31,25 +38,36 @@ function setup() {
 
   // broken GIF
   brokenGif = createImg('assets/brokenf.gif');
-  brokenGif.attribute("playsinline", "");   // ✅ for iPhone
+  brokenGif.attribute("playsinline", ""); 
   brokenGif.size(300, 300);
   brokenGif.position(width/2 - 150, height/2 - 150);
-  brokenGif.hide(); // hidden until piñata breaks
+  brokenGif.hide(); 
 
-  // reset button
+  // ✅ reset button (DOM event listeners for mobile reliability)
   resetButton = createButton("Reset Piñata");
-  resetButton.position(20, 20);
-  resetButton.mousePressed(resetGame);
+  resetButton.style("position", "fixed");
+  resetButton.style("top", "20px");
+  resetButton.style("left", "20px");
+  resetButton.style("z-index", "9999");
+  resetButton.style("padding", "12px 24px");
+  resetButton.style("font-size", "18px");
+  resetButton.style("background", "#ffcccc");
+  resetButton.style("border", "2px solid #000");
+  resetButton.style("cursor", "pointer");
+
+  // native listeners
+  resetButton.elt.addEventListener("click", resetGame);
+  resetButton.elt.addEventListener("touchstart", resetGame);
 }
 
 function draw() {
   background(random(255), random(255), random(255));
-  
+
   if (loading) {
     fill(0);
     textSize(40);
     text("Loading Piñata...", width/2, height/2);
-    return; // stop drawing until loaded
+    return;
   }
 
   if (!broken) {
@@ -65,11 +83,8 @@ function draw() {
     line(0, 0, 180, -180);
     pop();
 
-    if (swing > 0) {
-      swing -= 2;
-    }
+    if (swing > 0) swing -= 2;
 
-    // mystery counter while intact
     text("Taps: " + taps + " / ??", width/2, height - 50);
 
   } else {
@@ -88,11 +103,11 @@ function draw() {
       f.show();
     }
 
-    // reveal the actual taps + victory message 🎉
+    fill(0);
     text("It took " + taps + " taps!", width/2, height - 50);
     textSize(40);
-    fill(0);
     text("🎉 You did it! 🎉", width/2, height/2 + 200);
+    text("Tap Reset to play again", width/2, height/2 + 250);
   }
 }
 
@@ -114,20 +129,25 @@ function registerTap() {
       broken = true;
       spawnCandies();
       spawnConfetti();
-      if (cheerSound && !cheerSound.isPlaying()) {  // ✅ safety check
+      if (cheerSound && !cheerSound.isPlaying()) {
+        cheerSound.setVolume(1);
+        cheerSound.stop();   // restart from beginning
         cheerSound.play();
+        console.log("🎵 Cheer sound playing");
       }
     }
   }
 }
 
 function spawnCandies() {
+  candies = [];
   for (let i = 0; i < 30; i++) {
     candies.push(new Candy(random(width), -20, random(10, 25)));
   }
 }
 
 function spawnConfetti() {
+  confetti = [];
   for (let i = 0; i < 50; i++) {
     confetti.push(new Confetti(random(width), -20));
   }
@@ -204,8 +224,12 @@ function resetGame() {
   broken = false;
   taps = 0;
   candies = [];
-  confetti = [];   // clear old confetti
-  breakAt = int(random(6, 12));   // pick a new random taps goal 🎲
+  confetti = [];
+  breakAt = int(random(6, 12));
+
+  pinataGif.show();
+  brokenGif.hide();
+  console.log("🔄 Game reset");
 }
 
 function windowResized() {
