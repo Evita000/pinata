@@ -58,7 +58,10 @@ function setup() {
 }
 
 function draw() {
-  background(random(255), random(255), random(255));
+ let r = 200 + 55 * sin(frameCount * 0.01);
+let g = 200 + 55 * sin(frameCount * 0.013);
+let b = 200 + 55 * sin(frameCount * 0.017);
+background(r, g, b);
 
   if (loading) {
     fill(0);
@@ -245,3 +248,4 @@ function resizeGifs() {
     brokenGif.position(width/2 - imgSize/2, height/2 - imgSize/2);
   }
 }
+
