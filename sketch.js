@@ -84,47 +84,37 @@ function setup() {
 }
 
 function draw() {
-  // 🌈 Soft radial glow background (non-strobing)
-  drawGlowBackground();
+  function drawGlowBackground() {
+  const ctx = drawingContext;
+  const t = millis() * 0.0002;  // speed of color shift (higher = faster)
+  const cx = width / 2;
+  const cy = height / 2;
+  const maxR = Math.hypot(width, height) * 0.8;
 
-  if (loading) {
-    fill(255);
-    textSize(40);
-    text("Loading Piñata...", width / 2, height / 2);
-    return;
-  }
+  // Create hues that slowly rotate around the full color wheel
+  const hue1 = (t * 120) % 360;       // cycles every ~8 seconds
+  const hue2 = (hue1 + 120) % 360;    // 120° apart for contrast
+  const hue3 = (hue1 + 240) % 360;    // 240° apart for depth
 
-  if (!broken) {
-    pinataGif.show();
-    brokenGif.hide();
+  // Build a rich gradient (center → mid → edge)
+  const grad = ctx.createRadialGradient(cx, cy, maxR * 0.1, cx, cy, maxR);
+  grad.addColorStop(0.0, `hsla(${hue1}, 90%, 65%, 1)`);   // bright center
+  grad.addColorStop(0.5, `hsla(${hue2}, 80%, 45%, 0.95)`); // mid tone
+  grad.addColorStop(1.0, `hsla(${hue3}, 90%, 20%, 1)`);   // outer glow
 
-    // swinging stick
-    push();
-    translate(width / 2 - 120, height - 100);
-    rotate(radians(stickAngle + swing));
-    stroke(80, 50, 20);
-    strokeWeight(15);
-    line(0, 0, 180, -180);
-    pop();
+  ctx.save();
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, width, height);
+  ctx.restore();
 
-    if (swing > 0) swing -= 2;
-
-    fill(255);
-    text("Taps: " + taps + " / ??", width / 2, height - 50);
-
-  } else {
-    pinataGif.hide();
-    brokenGif.show();
-
-    for (let c of candies) { c.update(); c.show(); }
-    for (let f of confetti) { f.update(); f.show(); }
-
-    fill(255);
-    text("It took " + taps + " taps!", width / 2, height - 50);
-    textSize(40);
-    text("🎉 You did it! 🎉", width / 2, height / 2 + 200);
-    text("Tap Reset to play again", width / 2, height / 2 + 250);
-  }
+  // Add a gentle bloom overlay for softness
+  const bloom = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxR * 0.6);
+  bloom.addColorStop(0, 'rgba(255,255,255,0.1)');
+  bloom.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.save();
+  ctx.fillStyle = bloom;
+  ctx.fillRect(0, 0, width, height);
+  ctx.restore();
 }
 
 function touchStarted() {
@@ -269,6 +259,7 @@ function resizeGifs() {
   if (pinataGif){ pinataGif.size(s, s); pinataGif.position((width-s)/2, (height-s)/2); }
   if (brokenGif){ brokenGif.size(s, s); brokenGif.position((width-s)/2, (height-s)/2); }
 }
+
 
 
 
