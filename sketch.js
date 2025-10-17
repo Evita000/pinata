@@ -62,31 +62,27 @@ document.body.style.overflow = "hidden";
 }
 
 function draw() {
-// 🌈 Smooth color cycle between warm + cool tones
-let t = frameCount * 0.008;
+function draw() {
+  // 🌈 Smooth color cycle between warm + cool tones
+  let t = frameCount * 0.008;
 
-// Blend smoothly between two palettes
-let warmR = 255 * (0.5 + 0.5 * sin(t));
-let warmG = 170 * (0.5 + 0.5 * sin(t + 1.5));
-let warmB = 100 * (0.5 + 0.5 * sin(t + 3.0));
+  // Blend smoothly between two palettes
+  let warmR = 255 * (0.5 + 0.5 * sin(t));
+  let warmG = 170 * (0.5 + 0.5 * sin(t + 1.5));
+  let warmB = 100 * (0.5 + 0.5 * sin(t + 3.0));
 
-let coolR = 120 * (0.5 + 0.5 * sin(t + 2.5));
-let coolG = 200 * (0.5 + 0.5 * sin(t + 0.8));
-let coolB = 255 * (0.5 + 0.5 * sin(t + 4.0));
+  let coolR = 120 * (0.5 + 0.5 * sin(t + 2.5));
+  let coolG = 200 * (0.5 + 0.5 * sin(t + 0.8));
+  let coolB = 255 * (0.5 + 0.5 * sin(t + 4.0));
 
-// Mix warm and cool gradually
-let mixAmt = (sin(t * 0.5) + 1) / 2; // oscillates between 0–1
-let r = lerp(warmR, coolR, mixAmt);
-let g = lerp(warmG, coolG, mixAmt);
-let b = lerp(warmB, coolB, mixAmt);
+  // Mix warm and cool gradually
+  let mixAmt = (sin(t * 0.5) + 1) / 2; // oscillates 0–1
+  let r = lerp(warmR, coolR, mixAmt);
+  let g = lerp(warmG, coolG, mixAmt);
+  let b = lerp(warmB, coolB, mixAmt);
 
-background(r, g, b);
-document.body.style.backgroundColor = `rgb(${r|0},${g|0},${b|0})`;
-
-
-background(r, g, b); // canvas background (behind GIFs)
-document.body.style.backgroundColor = `rgb(${r|0},${g|0},${b|0})`; // page background too
-
+  background(r, g, b); // canvas background (behind GIFs)
+  document.body.style.backgroundColor = `rgb(${r|0},${g|0},${b|0})`; // page background too
 
   if (loading) {
     fill(0);
@@ -110,23 +106,15 @@ document.body.style.backgroundColor = `rgb(${r|0},${g|0},${b|0})`; // page backg
 
     if (swing > 0) swing -= 2;
 
+    fill(0);
     text("Taps: " + taps + " / ??", width/2, height - 50);
 
   } else {
     pinataGif.hide();
     brokenGif.show();
 
-    // falling candies
-    for (let c of candies) {
-      c.update();
-      c.show();
-    }
-
-    // falling confetti
-    for (let f of confetti) {
-      f.update();
-      f.show();
-    }
+    for (let c of candies) { c.update(); c.show(); }
+    for (let f of confetti) { f.update(); f.show(); }
 
     fill(0);
     text("It took " + taps + " taps!", width/2, height - 50);
@@ -273,6 +261,7 @@ function resizeGifs() {
     brokenGif.position(width/2 - imgSize/2, height/2 - imgSize/2);
   }
 }
+
 
 
 
