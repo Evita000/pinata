@@ -1,4 +1,4 @@
-/* Piñata Party — v21 mobile-proof */
+/* Piñata Party — v26 mobile-proof */
 let confetti = [];
 let candies = [];
 let cheerSound;
@@ -10,6 +10,7 @@ let taps = 0;
 let breakAt;
 let resetButton;
 let loading = true;
+let winAlpha = 0; // fade-in opacity
 
 // ---------- p5 lifecycle ----------
 function preload() {
@@ -22,7 +23,6 @@ function setup() {
   const cnv = createCanvas(windowWidth, windowHeight);
   cnv.elt.style.touchAction = "none";  // prevent scroll gestures
   colorMode(HSB, 360, 100, 100, 1);
-
   textAlign(CENTER, CENTER);
   textSize(32);
   breakAt = int(random(6, 12));
@@ -32,7 +32,7 @@ function setup() {
   // Intact GIF
   pinataGif = createImg('assets/pinataf.gif', 'pinata');
   pinataGif.attribute('playsinline', '');
-  pinataGif.style('pointer-events', 'none');    // don’t steal taps
+  pinataGif.style('pointer-events', 'none');
   pinataGif.hide();
   pinataGif.elt.onload = () => { loading = false; pinataGif.show(); };
 
@@ -44,13 +44,10 @@ function setup() {
 
   resizeGifs();
 
-  // Reset button: fixed position + native listeners (iOS-safe)
+  // Reset button
   resetButton = createButton("Reset Piñata");
-  // Use CSS fixed so it stays above canvas on mobile
   resetButton.addClass('btn-fix');
-  resetButton.mousePressed(resetGame); // p5 handler
-
-  // Native handlers with preventDefault (iOS Safari)
+  resetButton.mousePressed(resetGame);
   const nativeReset = (e) => { e.preventDefault(); e.stopPropagation(); resetGame(); };
   const btn = resetButton.elt;
   btn.addEventListener('click', nativeReset, { passive: false });
@@ -58,19 +55,15 @@ function setup() {
   btn.addEventListener('touchend', nativeReset, { passive: false });
   btn.addEventListener('pointerdown', nativeReset, { passive: false });
 
-  // Fallback if GIF onload doesn’t fire on some mobiles
+  // Fallback if GIF onload doesn’t fire
   setTimeout(() => { if (loading) { loading = false; pinataGif.show(); } }, 3000);
 }
 
 function draw() {
-  // 🌈 Smooth, device-proof glow (Canvas HSLA; consistent on iOS/Android)
   drawGlowBackground();
+  noStroke(); fill(255); textSize(12); text('v26', 20, 14);
 
-  // Version tag so you can confirm cache-bust on phone/laptop
- noStroke(); fill(255); textSize(12); text('v25', 20, 14);
-
-
-  // ---- Loading screen text ----
+  // ---- Loading text ----
   if (loading) {
     fill(0, 0, 100);
     textSize(40);
@@ -79,39 +72,36 @@ function draw() {
   }
 
   if (!broken) {
-    pinataGif.show(); 
-    brokenGif.hide();
+    pinataGif.show(); brokenGif.hide();
 
-    // swinging stick
+    // stick swing
     push();
     translate(width / 2 - 120, height - 100);
     rotate(radians(stickAngle + swing));
-    stroke(30, 60, 40);
-    strokeWeight(15);
+    stroke(30, 60, 40); strokeWeight(15);
     line(0, 0, 180, -180);
     pop();
     if (swing > 0) swing -= 2;
 
-    // ---- Tap counter text ----
+    // tap counter
     fill(0, 0, 100);
     textSize(32);
     text(`Taps: ${taps} / ??`, width / 2, height - 50);
 
   } else {
-    pinataGif.hide(); 
-    brokenGif.show();
+    pinataGif.hide(); brokenGif.show();
 
     for (const c of candies) { c.update(); c.show(); }
     for (const f of confetti) { f.update(); f.show(); }
 
-    // ---- Win texts ----
-    fill(0, 0, 100);
+    // fade in win text
+    winAlpha = min(1, winAlpha + 0.03);
+    fill(0, 0, 100, winAlpha);
     textSize(40);
     text('🎉 You did it! 🎉', width / 2, height / 2 + 200);
     text('💫 Party Unlocked! 💫', width / 2, height / 2 + 250);
   }
 }
-
 
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
@@ -128,6 +118,7 @@ function registerTap() {
   swing = 20;
   if (taps >= breakAt) {
     broken = true;
+    winAlpha = 0; // reset fade
     spawnCandies();
     spawnConfetti();
     if (cheerSound && !cheerSound.isPlaying()) { try { cheerSound.play(); } catch(e) {} }
@@ -139,6 +130,7 @@ function resetGame() {
   taps = 0;
   candies = [];
   confetti = [];
+  winAlpha = 0;
   breakAt = int(random(6, 12));
   pinataGif.show(); brokenGif.hide();
   resizeGifs();
@@ -151,7 +143,6 @@ function resizeGifs() {
   if (brokenGif) brokenGif.size(s, s).position((width - s)/2, (height - s)/2);
 }
 
-// Device-proof radial glow using Canvas HSLA (not p5 color mode)
 function drawGlowBackground() {
   const t = millis() * 0.00025;
   const cx = width / 2, cy = height / 2;
@@ -162,7 +153,6 @@ function drawGlowBackground() {
   const hue3 = (hue1 + 240) % 360;
 
   const ctx = drawingContext;
-
   const grad = ctx.createRadialGradient(cx, cy, maxR*0.1, cx, cy, maxR);
   grad.addColorStop(0.00, `hsla(${hue1}, 90%, 65%, 1)`);
   grad.addColorStop(0.55, `hsla(${hue2}, 80%, 45%, 0.95)`);
@@ -232,6 +222,3 @@ class Confetti {
     pop();
   }
 }
-
-
-
