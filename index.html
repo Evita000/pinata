@@ -3,38 +3,54 @@
   <head>
     <meta charset="UTF-8" />
     <title>Piñata Party</title>
-
-    <!-- Mobile sizing -->
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 
-    <!-- Load p5 core FIRST, then p5.sound, then your code -->
+    <!-- Order is VERY important -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/addons/p5.sound.min.js"></script>
-    <script defer src="sketch.js"></script>
+    <script defer src="sketch.js?v=3"></script>
 
     <style>
-      /* Keep things visible on mobile */
-      html, body { margin:0; padding:0; height:100%; overflow:hidden; background:#f4f4f4; }
-      canvas { position:fixed; inset:0; z-index:1; }
-      .ui { position:fixed; left:0; right:0; top:0; z-index:3; text-align:center; font:16px/1.4 system-ui; }
-      img.pinata { position:fixed; z-index:2; pointer-events:none; }
+      html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        overflow: hidden;
+        background: #f4f4f4;
+      }
+      canvas {
+        position: fixed;
+        inset: 0;
+        z-index: 1;
+      }
+      img.pinata {
+        position: fixed;
+        z-index: 2;
+        pointer-events: none;
+      }
+      .ui {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background: #ffe7e7;
+        color: #b00020;
+        font: 14px system-ui;
+        text-align: center;
+        padding: 0.3rem;
+        z-index: 3;
+      }
     </style>
 
     <script>
-      // Show errors ON SCREEN so phones don’t silently fail
-      window.addEventListener('error', e => {
-        const d = document.createElement('div');
-        d.className = 'ui';
-        d.style.color = '#b00020';
-        d.style.background = '#ffe7e7';
-        d.textContent = 'JS Error: ' + e.message;
+      // shows any JS errors on screen (useful for mobile debugging)
+      window.addEventListener("error", e => {
+        const d = document.createElement("div");
+        d.className = "ui";
+        d.textContent = "Error: " + e.message;
         document.body.appendChild(d);
       });
     </script>
   </head>
   <body></body>
 </html>
-
-
-
-
