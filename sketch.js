@@ -63,15 +63,17 @@ function setup() {
 }
 
 function draw() {
+  function draw() {
   // 🌈 Smooth, device-proof glow (Canvas HSLA; consistent on iOS/Android)
   drawGlowBackground();
 
   // Version tag so you can confirm cache-bust on phone
-  noStroke(); fill(255); textSize(12); text('v21', 20, 14);
+  noStroke(); fill(255); textSize(12); text('v22', 20, 14);
 
   if (loading) {
-    fill(0,0,20); textSize(40);
-    text("Loading Piñata...", width/2, height/2);
+    fill(0, 0, 100);
+    textSize(40);
+    text("🎈 Getting the party ready...", width / 2, height / 2);
     return;
   }
 
@@ -80,15 +82,15 @@ function draw() {
 
     // swinging stick
     push();
-    translate(width/2 - 120, height - 100);
+    translate(width / 2 - 120, height - 100);
     rotate(radians(stickAngle + swing));
     stroke(30, 60, 40); strokeWeight(15);
     line(0, 0, 180, -180);
     pop();
     if (swing > 0) swing -= 2;
 
-    fill(0,0,100);
-    text(`Taps: ${taps} / ??`, width/2, height - 50);
+    fill(0, 0, 100);
+    text(`Taps: ${taps} / ??`, width / 2, height - 50);
 
   } else {
     pinataGif.hide(); brokenGif.show();
@@ -96,12 +98,10 @@ function draw() {
     for (const c of candies) { c.update(); c.show(); }
     for (const f of confetti) { f.update(); f.show(); }
 
-    fill(0,0,100);
-    text(`It took ${taps} taps!`, width/2, height - 50);
+    fill(0, 0, 100);
     textSize(40);
-    text('🎉 You did it! 🎉', width/2, height/2 + 200);
-    textSize(32);
-    text('Tap Reset to play again', width/2, height/2 + 240);
+    text('🎉 You did it! 🎉', width / 2, height / 2 + 200);
+    text('💫 Party Unlocked! 💫', width / 2, height / 2 + 250);
   }
 }
 
@@ -224,3 +224,4 @@ class Confetti {
     pop();
   }
 }
+
