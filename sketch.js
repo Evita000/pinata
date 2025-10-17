@@ -83,7 +83,7 @@ function setup() {
   setTimeout(() => { if (loading) { loading = false; pinataGif.show(); } }, 3000);
 }
 
-function draw() {
+
 function draw() {
   // 🌈 Soft radial glow background (non-strobing)
   drawGlowBackground();  
@@ -266,6 +266,7 @@ function resizeGifs() {
   if (pinataGif){ pinataGif.size(s, s); pinataGif.position((width-s)/2, (height-s)/2); }
   if (brokenGif){ brokenGif.size(s, s); brokenGif.position((width-s)/2, (height-s)/2); }
 }
+
 
 
 
