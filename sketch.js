@@ -1,4 +1,4 @@
-/* Piñata Party — mobile-safe, smooth glow bg */
+/* Piñata Party — v21 mobile-proof */
 let confetti = [];
 let candies = [];
 let cheerSound;
@@ -13,7 +13,6 @@ let loading = true;
 
 // ---------- p5 lifecycle ----------
 function preload() {
-  // OK if it fails; game still works
   if (typeof loadSound === 'function') {
     try { cheerSound = loadSound('assets/cheer.mp3'); } catch(e) {}
   }
@@ -21,8 +20,9 @@ function preload() {
 
 function setup() {
   const cnv = createCanvas(windowWidth, windowHeight);
-  cnv.elt.style.touchAction = "none";           // prevent touch scroll stealing taps
-  colorMode(HSB, 360, 100, 100, 1);             // for vivid candy/confetti colors
+  cnv.elt.style.touchAction = "none";  // prevent scroll gestures
+  colorMode(HSB, 360, 100, 100, 1);
+
   textAlign(CENTER, CENTER);
   textSize(32);
   breakAt = int(random(6, 12));
@@ -44,26 +44,30 @@ function setup() {
 
   resizeGifs();
 
-  // Reset button (p5 + native listeners for iOS)
+  // Reset button: fixed position + native listeners (iOS-safe)
   resetButton = createButton("Reset Piñata");
-  resetButton.position(20, 20);
-  resetButton.style('z-index', '9999');
-  resetButton.mousePressed(resetGame);
+  // Use CSS fixed so it stays above canvas on mobile
+  resetButton.addClass('btn-fix');
+  resetButton.mousePressed(resetGame); // p5 handler
+
+  // Native handlers with preventDefault (iOS Safari)
   const nativeReset = (e) => { e.preventDefault(); e.stopPropagation(); resetGame(); };
-  resetButton.elt.addEventListener('click', nativeReset, { passive: false });
-  resetButton.elt.addEventListener('touchstart', nativeReset, { passive: false });
-  resetButton.elt.addEventListener('pointerdown', nativeReset, { passive: false });
+  const btn = resetButton.elt;
+  btn.addEventListener('click', nativeReset, { passive: false });
+  btn.addEventListener('touchstart', nativeReset, { passive: false });
+  btn.addEventListener('touchend', nativeReset, { passive: false });
+  btn.addEventListener('pointerdown', nativeReset, { passive: false });
 
   // Fallback if GIF onload doesn’t fire on some mobiles
   setTimeout(() => { if (loading) { loading = false; pinataGif.show(); } }, 3000);
 }
 
 function draw() {
-  // 🌈 Smooth, device-proof glow (uses Canvas HSLA; same on iOS/Android)
+  // 🌈 Smooth, device-proof glow (Canvas HSLA; consistent on iOS/Android)
   drawGlowBackground();
 
-  // Version tag so you know the cache-bust loaded
-  noStroke(); fill(255); textSize(12); text('v20', 20, 14);
+  // Version tag so you can confirm cache-bust on phone
+  noStroke(); fill(255); textSize(12); text('v21', 20, 14);
 
   if (loading) {
     fill(0,0,20); textSize(40);
