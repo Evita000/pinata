@@ -38,16 +38,18 @@ function setup() {
   const cnv = createCanvas(windowWidth, windowHeight);
   cnv.elt.style.touchAction = "none";
 
+  // 🌈 enable hue-based color mode (fixes gray issue)
+  colorMode(HSB, 360, 100, 100, 1);
+
   textAlign(CENTER, CENTER);
   textSize(32);
   breakAt = int(random(6, 12));
 
-  // Only call userStartAudio if p5.sound exists
   if (hasLoadSound && typeof userStartAudio === 'function') {
     userStartAudio();
   }
 
-  // Intact GIF
+  // intact GIF
   pinataGif = createImg('assets/pinataf.gif', 'pinata');
   pinataGif.addClass('pinata');
   pinataGif.attribute("playsinline", "");
@@ -55,17 +57,16 @@ function setup() {
   pinataGif.hide();
   pinataGif.elt.onload = () => { loading = false; pinataGif.show(); };
 
-  // Broken GIF
+  // broken GIF
   brokenGif = createImg('assets/brokenf.gif', 'broken');
   brokenGif.addClass('pinata');
   brokenGif.attribute("playsinline", "");
   brokenGif.style("pointer-events", "none");
   brokenGif.hide();
 
-  // Position & scale
   resizeGifs();
 
-  // Reset button
+  // reset button
   resetButton = createButton("Reset Piñata");
   resetButton.style("position", "fixed");
   resetButton.style("top", "20px");
@@ -79,48 +80,54 @@ function setup() {
   resetButton.elt.addEventListener("click", resetGame, {passive:true});
   resetButton.elt.addEventListener("touchstart", resetGame, {passive:true});
 
-  // Safety: if onload never fires (some iOS cases), unstick after 3s
   setTimeout(() => { if (loading) { loading = false; pinataGif.show(); } }, 3000);
 }
 
 function draw() {
-  function drawGlowBackground() {
-  const ctx = drawingContext;
-  const t = millis() * 0.0002;  // speed of color shift (higher = faster)
-  const cx = width / 2;
-  const cy = height / 2;
-  const maxR = Math.hypot(width, height) * 0.8;
+  // 🌈 soft color-changing glow background
+  drawGlowBackground();
 
-  // Create hues that slowly rotate around the full color wheel
-  const hue1 = (t * 120) % 360;       // cycles every ~8 seconds
-  const hue2 = (hue1 + 120) % 360;    // 120° apart for contrast
-  const hue3 = (hue1 + 240) % 360;    // 240° apart for depth
+  if (loading) {
+    fill(0, 0, 20);
+    textSize(40);
+    text("Loading Piñata...", width / 2, height / 2);
+    return;
+  }
 
-  // Build a rich gradient (center → mid → edge)
-  const grad = ctx.createRadialGradient(cx, cy, maxR * 0.1, cx, cy, maxR);
-  grad.addColorStop(0.0, `hsla(${hue1}, 90%, 65%, 1)`);   // bright center
-  grad.addColorStop(0.5, `hsla(${hue2}, 80%, 45%, 0.95)`); // mid tone
-  grad.addColorStop(1.0, `hsla(${hue3}, 90%, 20%, 1)`);   // outer glow
+  if (!broken) {
+    pinataGif.show();
+    brokenGif.hide();
 
-  ctx.save();
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, width, height);
-  ctx.restore();
+    // swinging stick
+    push();
+    translate(width / 2 - 120, height - 100);
+    rotate(radians(stickAngle + swing));
+    stroke(30, 60, 40);
+    strokeWeight(15);
+    line(0, 0, 180, -180);
+    pop();
 
-  // Add a gentle bloom overlay for softness
-  const bloom = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxR * 0.6);
-  bloom.addColorStop(0, 'rgba(255,255,255,0.1)');
-  bloom.addColorStop(1, 'rgba(255,255,255,0)');
-  ctx.save();
-  ctx.fillStyle = bloom;
-  ctx.fillRect(0, 0, width, height);
-  ctx.restore();
+    if (swing > 0) swing -= 2;
+
+    fill(0, 0, 100);
+    text("Taps: " + taps + " / ??", width / 2, height - 50);
+
+  } else {
+    pinataGif.hide();
+    brokenGif.show();
+
+    for (let c of candies) { c.update(); c.show(); }
+    for (let f of confetti) { f.update(); f.show(); }
+
+    fill(0, 0, 100);
+    text("It took " + taps + " taps!", width / 2, height - 50);
+    textSize(40);
+    text("🎉 You did it! 🎉", width / 2, height / 2 + 200);
+    text("Tap Reset to play again", width / 2, height / 2 + 250);
+  }
 }
 
-function touchStarted() {
-  registerTap();
-  return false; // iOS: prevent event from being swallowed
-}
+function touchStarted() { registerTap(); return false; }
 function mousePressed() { registerTap(); return false; }
 
 function registerTap() {
@@ -153,7 +160,7 @@ class Candy {
   constructor(x, y, r) {
     this.x = x; this.y = y; this.r = r;
     this.speed = random(2, 6);
-    this.color = color(random(255), random(255), random(255));
+    this.color = color(random(360), 80, 100);
     this.angle = random(TWO_PI);
     this.rotationSpeed = random(-0.05, 0.05);
     this.type = random() < 0.5 ? "circle" : "wrapped";
@@ -179,7 +186,7 @@ class Confetti {
     this.size = random(5, 12);
     this.speedY = random(2, 6);
     this.speedX = random(-2, 2);
-    this.color = color(random(255), random(255), random(255));
+    this.color = color(random(360), 80, 100);
     this.angle = random(TWO_PI);
     this.rotationSpeed = random(-0.1, 0.1);
   }
@@ -208,60 +215,26 @@ function windowResized() {
   resizeGifs();
 }
 
-// ---- centers & scales the GIFs
+// center gifs
 function resizeGifs() {
   const s = Math.min(width, height) * 0.7;
-  if (pinataGif){ pinataGif.size(s, s); pinataGif.position((width-s)/2, (height-s)/2); }
-  if (brokenGif){ brokenGif.size(s, s); brokenGif.position((width-s)/2, (height-s)/2); }
+  if (pinataGif) pinataGif.size(s, s).position((width - s) / 2, (height - s) / 2);
+  if (brokenGif) brokenGif.size(s, s).position((width - s) / 2, (height - s) / 2);
 }
 
-// ---- dreamy glow background helper (this makes it GLOW)
+// 🌈 color-changing glow background
 function drawGlowBackground() {
-  const ctx = drawingContext;
-  const t = millis() * 0.00025;
-  const cx = width / 2;
-  const cy = height / 2;
-  const maxR = Math.hypot(width, height) * 0.75;
+  const h = (millis() * 0.02) % 360;   // smoothly cycles hue
+  background(h, 60, 95);               // bright color base
 
-  // Two smoothly changing hues
-  const hue1 = (200 + 60 * sin(t * 1.3)) % 360;
-  const hue2 = (320 + 60 * cos(t * 1.1)) % 360;
-
-  // Radial gradient for the glow
-  const grad = ctx.createRadialGradient(cx, cy, maxR * 0.1, cx, cy, maxR);
-  grad.addColorStop(0.0, `hsla(${hue1}, 80%, 65%, 1)`);
-  grad.addColorStop(0.6, `hsla(${(hue1 + hue2) / 2}, 70%, 40%, 0.9)`);
-  grad.addColorStop(1.0, `hsla(${hue2}, 80%, 15%, 1)`);
-
-  ctx.save();
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, width, height);
-  ctx.restore();
-
-  // Subtle white bloom in the center
-  const bloom = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxR * 0.6);
-  bloom.addColorStop(0, 'rgba(255,255,255,0.08)');
-  bloom.addColorStop(1, 'rgba(255,255,255,0)');
-  ctx.save();
-  ctx.fillStyle = bloom;
-  ctx.fillRect(0, 0, width, height);
-  ctx.restore();
+  noStroke();
+  const steps = 12;
+  const cx = width / 2, cy = height / 2;
+  const maxR = Math.hypot(width, height) * 0.65;
+  for (let i = steps; i >= 1; i--) {
+    const r = (i / steps) * maxR;
+    const a = 0.06 * (i / steps);
+    fill((h + i * 15) % 360, 70, 90, a);
+    ellipse(cx, cy, r * 2, r * 2);
+  }
 }
-
-
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
-  resizeGifs();
-}
-
-function resizeGifs() {
-  const s = Math.min(width, height) * 0.7;
-  if (pinataGif){ pinataGif.size(s, s); pinataGif.position((width-s)/2, (height-s)/2); }
-  if (brokenGif){ brokenGif.size(s, s); brokenGif.position((width-s)/2, (height-s)/2); }
-}
-
-
-
-
-
-
