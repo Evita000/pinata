@@ -5,27 +5,22 @@
   <title>Piñata Party</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 
-  <!-- ORDER MATTERS: p5 core -> p5.sound -> your sketch -->
+  <!-- Load p5 in the correct order -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/addons/p5.sound.min.js"></script>
-  <script defer src="sketch.js?v=9"></script>
+  <script defer src="sketch.js?v=9999"></script>
 
   <style>
-    html,body{margin:0;height:100%;overflow:hidden;background:#f4f4f4}
-    canvas{position:fixed;inset:0;z-index:1}
-    img.pinata{position:fixed;z-index:2;pointer-events:none}
-    .ui{position:fixed;left:0;right:0;top:0;z-index:3;text-align:center;
-        font:14px system-ui;padding:.4rem;background:#ffe7e7;color:#b00020}
+    html,body{margin:0;height:100%;overflow:hidden;background:#000}
+    canvas{position:fixed;inset:0}
+    .ui{position:fixed;left:0;right:0;top:0;background:#ffe7e7;color:#b00020;
+        font:14px system-ui;padding:.4rem;text-align:center;z-index:9999}
   </style>
   <script>
-    // Show runtime errors ON SCREEN so mobile doesn't hide them
+    // Show file + line for any syntax error
     window.addEventListener('error', e => {
       const d=document.createElement('div'); d.className='ui';
-      d.textContent='JS Error: '+e.message; document.body.appendChild(d);
-    });
-    window.addEventListener('unhandledrejection', e => {
-      const d=document.createElement('div'); d.className='ui';
-      d.textContent='Promise Error: '+(e.reason && e.reason.message || e.reason);
+      d.textContent = `JS Error: ${e.message}  at  ${e.filename}:${e.lineno}:${e.colno}`;
       document.body.appendChild(d);
     });
   </script>
