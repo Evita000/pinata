@@ -11,19 +11,21 @@ let resetButton;
 let loading = true;
 
 function preload() {
-  cheerSound = loadSound('assets/cheer.mp3', 
-    () => console.log("✅ Cheer sound loaded"), 
+  // You can comment this out temporarily if audio causes issues on iPhone
+  cheerSound = loadSound(
+    'assets/cheer.mp3',
+    () => console.log("✅ Cheer sound loaded"),
     () => console.log("❌ Failed to load sound")
   );
 }
 
 function setup() {
-  let cnv = createCanvas(windowWidth, windowHeight);
+  const cnv = createCanvas(windowWidth, windowHeight);
   cnv.elt.style.touchAction = "none"; // stop canvas from eating touches
-  // Make the page background visible and remove scrollbars
-document.body.style.margin = "0";
-document.body.style.overflow = "hidden";
 
+  // Make the page background visible and remove scrollbars
+  document.body.style.margin = "0";
+  document.body.style.overflow = "hidden";
 
   userStartAudio();   // unlocks audio on mobile
   textAlign(CENTER, CENTER);
@@ -32,14 +34,16 @@ document.body.style.overflow = "hidden";
 
   // intact GIF
   pinataGif = createImg('assets/pinataf.gif');
-  pinataGif.attribute("playsinline", ""); 
+  pinataGif.attribute("playsinline", "");
+  pinataGif.style("pointer-events", "none"); // don't steal taps
   pinataGif.hide();
   pinataGif.elt.onload = () => { loading = false; pinataGif.show(); };
 
   // broken GIF
   brokenGif = createImg('assets/brokenf.gif');
-  brokenGif.attribute("playsinline", ""); 
-  brokenGif.hide(); 
+  brokenGif.attribute("playsinline", "");
+  brokenGif.style("pointer-events", "none");
+  brokenGif.hide();
 
   // scale + center gifs initially
   resizeGifs();
@@ -58,10 +62,9 @@ document.body.style.overflow = "hidden";
 
   // native listeners for mobile reliability
   resetButton.elt.addEventListener("click", resetGame);
-  resetButton.elt.addEventListener("touchstart", resetGame);
+  resetButton.elt.addEventListener("touchstart", resetGame, {passive:true});
 }
 
-function draw() {
 function draw() {
   // 🌈 Smooth color cycle between warm + cool tones
   let t = frameCount * 0.008;
@@ -177,17 +180,14 @@ class Candy {
     this.rotationSpeed = random(-0.05, 0.05);
     this.type = random() < 0.5 ? "circle" : "wrapped";
   }
-
   update() {
     this.y += this.speed;
     this.angle += this.rotationSpeed;
   }
-
   show() {
     push();
     translate(this.x, this.y);
     rotate(this.angle);
-
     if (this.type === "circle") {
       fill(this.color);
       noStroke();
@@ -214,13 +214,11 @@ class Confetti {
     this.angle = random(TWO_PI);
     this.rotationSpeed = random(-0.1, 0.1);
   }
-
   update() {
     this.y += this.speedY;
     this.x += this.speedX;
     this.angle += this.rotationSpeed;
   }
-
   show() {
     push();
     translate(this.x, this.y);
@@ -239,7 +237,6 @@ function resetGame() {
   candies = [];
   confetti = [];
   breakAt = int(random(6, 12));
-
   pinataGif.show();
   brokenGif.hide();
   resizeGifs(); // make sure gifs are centered after reset
@@ -254,14 +251,10 @@ function windowResized() {
 // ✅ helper: resize gifs proportionally
 function resizeGifs() {
   if (pinataGif && brokenGif) {
-    let imgSize = min(width, height) * 0.7;  // 70% of smaller screen side
+    const imgSize = min(width, height) * 0.7;  // 70% of smaller screen side
     pinataGif.size(imgSize, imgSize);
     brokenGif.size(imgSize, imgSize);
     pinataGif.position(width/2 - imgSize/2, height/2 - imgSize/2);
     brokenGif.position(width/2 - imgSize/2, height/2 - imgSize/2);
   }
 }
-
-
-
-
