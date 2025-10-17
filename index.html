@@ -1,56 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <title>Piñata Party</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta charset="utf-8" />
+    <!-- Make sure it scales properly on iPhones -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 
-    <!-- Order is VERY important -->
+    <title>Piñata Party</title>
+
+    <!-- p5.js core library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
+
+    <!-- p5.js sound library (must come after p5.js) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/addons/p5.sound.min.js"></script>
-    <script defer src="sketch.js?v=3"></script>
+
+    <!-- your sketch -->
+    <script src="sketch.js"></script>
 
     <style>
+      /* Make sure the canvas fills the screen on all phones */
       html, body {
         margin: 0;
         padding: 0;
-        height: 100%;
         overflow: hidden;
-        background: #f4f4f4;
+        height: 100%;
+        background: #000; /* fallback background */
       }
       canvas {
-        position: fixed;
-        inset: 0;
-        z-index: 1;
-      }
-      img.pinata {
-        position: fixed;
-        z-index: 2;
-        pointer-events: none;
-      }
-      .ui {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        background: #ffe7e7;
-        color: #b00020;
-        font: 14px system-ui;
-        text-align: center;
-        padding: 0.3rem;
-        z-index: 3;
+        display: block;
       }
     </style>
-
-    <script>
-      // shows any JS errors on screen (useful for mobile debugging)
-      window.addEventListener("error", e => {
-        const d = document.createElement("div");
-        d.className = "ui";
-        d.textContent = "Error: " + e.message;
-        document.body.appendChild(d);
-      });
-    </script>
   </head>
-  <body></body>
+  <body>
+  </body>
 </html>
+
+
