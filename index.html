@@ -1,37 +1,21 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <!-- Make sure it scales properly on iPhones -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<head>
+  <meta charset="utf-8" />
+  <title>Piñata Party</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
 
-    <title>Piñata Party</title>
+  <!-- p5 in correct order -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/addons/p5.sound.min.js"></script>
 
-    <!-- p5.js core library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
+  <!-- your sketch (bump v= number to bust cache on phone) -->
+  <script defer src="sketch.js?v=20"></script>
 
-    <!-- p5.js sound library (must come after p5.js) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/addons/p5.sound.min.js"></script>
-
-    <!-- your sketch -->
-    <script src="sketch.js"></script>
-
-    <style>
-      /* Make sure the canvas fills the screen on all phones */
-      html, body {
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        height: 100%;
-        background: #000; /* fallback background */
-      }
-      canvas {
-        display: block;
-      }
-    </style>
-  </head>
-  <body>
-  </body>
+  <style>
+    html,body{margin:0;height:100%;overflow:hidden;background:#000}
+    canvas{position:fixed;inset:0;display:block}
+  </style>
+</head>
+<body></body>
 </html>
-
-
