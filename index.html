@@ -1,37 +1,34 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <!-- Make sure it scales properly on iPhones -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<head>
+  <meta charset="utf-8" />
+  <title>Piñata Party</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 
-    <title>Piñata Party</title>
+  <!-- ORDER MATTERS: p5 core -> p5.sound -> your sketch -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/addons/p5.sound.min.js"></script>
+  <script defer src="sketch.js?v=9"></script>
 
-    <!-- p5.js core library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/p5.min.js"></script>
-
-    <!-- p5.js sound library (must come after p5.js) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.6.0/addons/p5.sound.min.js"></script>
-
-    <!-- your sketch -->
-    <script src="sketch.js"></script>
-
-    <style>
-      /* Make sure the canvas fills the screen on all phones */
-      html, body {
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        height: 100%;
-        background: #000; /* fallback background */
-      }
-      canvas {
-        display: block;
-      }
-    </style>
-  </head>
-  <body>
-  </body>
+  <style>
+    html,body{margin:0;height:100%;overflow:hidden;background:#f4f4f4}
+    canvas{position:fixed;inset:0;z-index:1}
+    img.pinata{position:fixed;z-index:2;pointer-events:none}
+    .ui{position:fixed;left:0;right:0;top:0;z-index:3;text-align:center;
+        font:14px system-ui;padding:.4rem;background:#ffe7e7;color:#b00020}
+  </style>
+  <script>
+    // Show runtime errors ON SCREEN so mobile doesn't hide them
+    window.addEventListener('error', e => {
+      const d=document.createElement('div'); d.className='ui';
+      d.textContent='JS Error: '+e.message; document.body.appendChild(d);
+    });
+    window.addEventListener('unhandledrejection', e => {
+      const d=document.createElement('div'); d.className='ui';
+      d.textContent='Promise Error: '+(e.reason && e.reason.message || e.reason);
+      document.body.appendChild(d);
+    });
+  </script>
+</head>
+<body></body>
 </html>
-
-
