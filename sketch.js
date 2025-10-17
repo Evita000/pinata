@@ -84,31 +84,50 @@ function setup() {
 }
 
 function draw() {
-// 🌸 Soft pastel glow background (dreamy, non-strobing)
-noStroke();
+function draw() {
+  // 🌈 Soft radial glow background (non-strobing)
+  drawGlowBackground();  
 
-// Time for animation (slow and smooth)
-let t = millis() * 0.0003;
+  if (loading) {
+    fill(255);
+    textSize(40);
+    text("Loading Piñata...", width / 2, height / 2);
+    return;
+  }
 
-// Two slowly shifting colors (warm + cool)
-let topColor = color(
-  200 + 55 * sin(t * 1.3),   // R
-  150 + 55 * sin(t * 1.7),   // G
-  255                        // B
-);
-let bottomColor = color(
-  255,
-  180 + 60 * sin(t * 1.4),
-  200 + 30 * cos(t * 1.1)
-);
+  if (!broken) {
+    pinataGif.show();
+    brokenGif.hide();
 
-// Draw a smooth vertical gradient
-for (let y = 0; y < height; y++) {
-  let inter = map(y, 0, height, 0, 1);
-  let c = lerpColor(topColor, bottomColor, inter);
-  stroke(c);
-  line(0, y, width, y);
+    // swinging stick
+    push();
+    translate(width / 2 - 120, height - 100);
+    rotate(radians(stickAngle + swing));
+    stroke(80, 50, 20);
+    strokeWeight(15);
+    line(0, 0, 180, -180);
+    pop();
+
+    if (swing > 0) swing -= 2;
+
+    fill(255);
+    text("Taps: " + taps + " / ??", width / 2, height - 50);
+
+  } else {
+    pinataGif.hide();
+    brokenGif.show();
+
+    for (let c of candies) { c.update(); c.show(); }
+    for (let f of confetti) { f.update(); f.show(); }
+
+    fill(255);
+    text("It took " + taps + " taps!", width / 2, height - 50);
+    textSize(40);
+    text("🎉 You did it! 🎉", width / 2, height / 2 + 200);
+    text("Tap Reset to play again", width / 2, height / 2 + 250);
+  }
 }
+
 
 
 
@@ -247,5 +266,6 @@ function resizeGifs() {
   if (pinataGif){ pinataGif.size(s, s); pinataGif.position((width-s)/2, (height-s)/2); }
   if (brokenGif){ brokenGif.size(s, s); brokenGif.position((width-s)/2, (height-s)/2); }
 }
+
 
 
