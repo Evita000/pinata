@@ -61,7 +61,7 @@ function setup() {
 
 function draw() {
   drawGlowBackground();
-  noStroke(); fill(255); textSize(12); text('v26', 20, 14);
+ 
 
   // ---- Loading text ----
   if (loading) {
@@ -222,3 +222,4 @@ class Confetti {
     pop();
   }
 }
+
